@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<title>Londres Sin Red</title>
+<meta name="description" content="Mapa de Londres con navegación calle a calle, metro, tren y autobús que funciona sin conexión.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161c22" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Londres">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="map" role="application" aria-label="Mapa de Londres"></div>
+
+<header id="top"></header>
+
+<div id="search-panel" hidden>
+  <div class="card searchbar active">
+    <button class="icon" data-act="search-close" aria-label="Volver"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11 4 1.4 1.4L7.8 10H21v2H7.8l4.6 4.6L11 18l-7-7Z"/></svg></button>
+    <input id="q" type="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Buscar">
+  </div>
+  <ul id="results" class="list"></ul>
+</div>
+
+<section id="sheet" aria-live="polite">
+  <button class="grab" aria-label="Plegar o desplegar el panel"></button>
+  <div class="content"></div>
+</section>
+
+<div id="navbanner" class="navbanner" hidden aria-live="assertive"></div>
+<div id="navbar" class="navbar" hidden></div>
+<div id="fabs"></div>
+<div id="progress" hidden><span></span><div class="bar"><i></i></div></div>
+<div id="toast" role="status" hidden></div>
+
+<noscript>Esta app necesita JavaScript.</noscript>
+<script src="vendor/maplibre-gl.js"></script>
+<script src="vendor/pmtiles.js"></script>
+<script src="vendor/basemaps.js"></script>
+<script>
+  // Opened from the source folder (not the published site): explain instead of showing a blank screen.
+  if (!window.maplibregl) {
+    document.body.innerHTML = '<div style="max-width:34em;margin:15vh auto;padding:0 20px;font:16px/1.5 system-ui,sans-serif;color:#14202b">'
+      + '<h1 style="font-size:22px">Esta carpeta es el código de la app</h1>'
+      + '<p>El mapa de Londres no viene dentro del archivo zip: se genera al publicar la app en GitHub, que descarga los datos de calles, metro y autobuses.</p>'
+      + '<p>Sigue los pasos de <b>README.md</b> («Cómo publicarla») y abre después la dirección <b>https://TU_USUARIO.github.io/…</b> que te da GitHub.</p></div>';
+    document.body.style.overflow = "auto";
+  }
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

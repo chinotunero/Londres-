@@ -1,0 +1,69 @@
+name: Construir y publicar
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 4 * * 1" # every Monday: fresh OpenStreetMap data
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          npm ci
+          pip install -r scripts/requirements.txt
+
+      - name: Descargar datos de Londres
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAXZOOM: ${{ vars.MAXZOOM || '15' }}
+        run: bash scripts/fetch_data.sh build
+
+      - name: Procesar calles, transporte y direcciones
+        run: python3 scripts/build_data.py build/greater-london-latest.osm.pbf build/data
+
+      - name: Probar rutas (Westminster → Torre de Londres)
+        run: node scripts/test_engine.mjs build/data 51.5007,-0.1246 51.5081,-0.0759
+
+      - name: Montar el sitio
+        run: node scripts/assemble.mjs build/data build/londres.pmtiles build/basemaps-assets dist
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
